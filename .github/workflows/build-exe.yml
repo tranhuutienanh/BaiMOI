@@ -20,7 +20,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pyinstaller
-          pip install -r requirements.txt || echo "No requirements.txt found"
+          if (Test-Path "requirements.txt") {
+              pip install -r requirements.txt
+          } else {
+              echo "No requirements.txt found"
+          }
 
       - name: Build EXE
         run: pyinstaller --onefile BaiKHKT.py
