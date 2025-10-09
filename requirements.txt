@@ -1,0 +1,8 @@
+tkinter
+requests
+beautifulsoup4
+docx
+fpdf
+reportlab
+sentence-transformers
+torch
