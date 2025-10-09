@@ -1,36 +1,44 @@
-name: Build EXE
+name: Build baikhkt.exe for Windows
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:  # Cho phép chạy thủ công trong tab Actions
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repo
+      # 1️⃣ Lấy toàn bộ code trong repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Cài Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # 3️⃣ Cài các thư viện cần thiết cho dự án (không cần requirements.txt)
       - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install pyinstaller
-          if (Test-Path "requirements.txt") {
-              pip install -r requirements.txt
-          } else {
-              echo "No requirements.txt found"
-          }
+          pip install requests beautifulsoup4 python-docx fpdf reportlab sentence-transformers torch
 
+      # 4️⃣ Build file .exe từ script baikhkt.py
       - name: Build EXE
-        run: pyinstaller --onefile BaiKHKT.py
+        run: |
+          pyinstaller --onefile --noconsole baikhkt.py
 
-      - name: Upload EXE
+      # 5️⃣ Nén file kết quả thành .zip
+      - name: Create ZIP package
+        run: |
+          cd dist
+          powershell Compress-Archive -Path baikhkt.exe -DestinationPath baikhkt-Windows.zip
+
+      # 6️⃣ Upload file zip để tải trong tab Actions
+      - name: Upload EXE artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BaiKHKT-exe
-          path: dist/BaiKHKT.exe
+          name: baikhkt-Windows
+          path: dist/baikhkt-Windows.zip
